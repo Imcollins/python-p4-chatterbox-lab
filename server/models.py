@@ -1,14 +1,13 @@
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import MetaData
-from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
 
-metadata = MetaData(naming_convention={
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-})
+Base = declarative_base()
 
-db = SQLAlchemy(metadata=metadata)
-
-class Message(db.Model, SerializerMixin):
+class Message(Base):
     __tablename__ = 'messages'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
+    body = Column(String)
+
+    def __init__(self, body):
+        self.body = body

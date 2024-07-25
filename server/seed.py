@@ -1,34 +1,24 @@
-#!/usr/bin/env python3
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from models import Base, Message  # Ensure the correct import
 
-from random import choice as rc
+# Replace with your actual database URL
+engine = create_engine('sqlite:///your_database.db')
+Base.metadata.create_all(engine)
 
-from faker import Faker
-
-from app import app
-from models import db, Message
-
-fake = Faker()
-
-usernames = [fake.first_name() for i in range(4)]
-if "Duane" not in usernames:
-    usernames.append("Duane")
+Session = sessionmaker(bind=engine)
+session = Session()
 
 def make_messages():
+    messages = [
+        {"body": "Hello, World!"},
+        {"body": "This is a test message."},
+        {"body": "Another message."}
+    ]
 
-    Message.query.delete()
-    
-    messages = []
+    for msg in messages:
+        message = Message(body=msg["body"])
+        session.add(message)
+    session.commit()
 
-    for i in range(20):
-        message = Message(
-            body=fake.sentence(),
-            username=rc(usernames),
-        )
-        messages.append(message)
-
-    db.session.add_all(messages)
-    db.session.commit()        
-
-if __name__ == '__main__':
-    with app.app_context():
-        make_messages()
+make_messages()
